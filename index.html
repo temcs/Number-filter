@@ -1,13 +1,121 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Number Extractor & Formatter</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4">
+  <main class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl space-y-6">
+    <header class="text-center space-y-1">
+      <h1 class="text-xl font-bold tracking-tight text-white">Number Formatter</h1>
+      <p class="text-xs text-slate-400">Paste raw numbers to extract and format instantly</p>
+    </header>
 
-<i class="fa fa-car"></i>
-<i class="fa fa-car" style="font-size:48px;"></i>
-<i class="fa fa-car" style="font-size:60px;color:red;"></i>
+    <!-- Input Section -->
+    <div class="space-y-2">
+      <label for="rawInput" class="text-xs font-semibold uppercase tracking-wider text-slate-400">Input</label>
+      <div class="relative">
+        <input
+          id="rawInput"
+          type="text"
+          placeholder="e.g. +880 1604-326467"
+          class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 transition-colors placeholder:text-slate-600"
+          oninput="processInput()"
+        />
+        <button
+          onclick="pasteClipboard()"
+          class="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition"
+        >
+          Paste
+        </button>
+      </div>
+    </div>
 
+    <!-- Output Section -->
+    <div class="space-y-4 pt-2">
+      <!-- 1st Output -->
+      <div class="space-y-1.5">
+        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">1st: Formatted Number</span>
+        <div class="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-xl p-3.5">
+          <span id="output1" class="font-mono text-sm sm:text-base text-blue-400 font-semibold truncate">+1604326467</span>
+          <button
+            onclick="copyText('output1', this)"
+            class="ml-3 shrink-0 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white text-xs font-medium px-4 py-2 rounded-lg transition"
+          >
+            Copy
+          </button>
+        </div>
+      </div>
+
+      <!-- 2nd Output -->
+      <div class="space-y-1.5">
+        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">2nd: Default Output</span>
+        <div class="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-xl p-3.5">
+          <span id="output2" class="font-mono text-sm sm:text-base text-emerald-400 font-semibold truncate">12345678</span>
+          <button
+            onclick="copyText('output2', this)"
+            class="ml-3 shrink-0 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 text-xs font-medium px-4 py-2 rounded-lg border border-slate-700 transition"
+          >
+            Copy
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function processInput() {
+      const raw = document.getElementById('rawInput').value.trim();
+      const output1 = document.getElementById('output1');
+
+      if (!raw) {
+        output1.textContent = '+1604326467';
+        return;
+      }
+
+      // Strip non-digit characters except leading '+'
+      let clean = raw.replace(/[^\d+]/g, '');
+
+      // Remove Bangladesh prefix '880' or '+880' if present
+      if (clean.startsWith('+880')) {
+        clean = clean.replace('+880', '');
+      } else if (clean.startsWith('880')) {
+        clean = clean.replace('880', '');
+      } else if (clean.startsWith('+')) {
+        clean = clean.substring(1);
+      }
+
+      output1.textContent = '+' + clean.replace(/\D/g, '');
+    }
+
+    async function pasteClipboard() {
+      try {
+        const text = await navigator.clipboard.readText();
+        document.getElementById('rawInput').value = text;
+        processInput();
+      } catch (err) {
+        alert('Please allow clipboard permissions or paste manually.');
+      }
+    }
+
+    async function copyText(elementId, btn) {
+      const text = document.getElementById(elementId).textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+        const originalText = btn.textContent;
+        btn.textContent = 'Copied!';
+        btn.classList.add('bg-emerald-600', 'text-white');
+        
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.classList.remove('bg-emerald-600', 'text-white');
+        }, 1200);
+      } catch (err) {
+        alert('Failed to copy to clipboard.');
+      }
+    }
+  </script>
 </body>
 </html>
