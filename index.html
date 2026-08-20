@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Number Extractor & Formatter</title>
+  <title>Number Formatter</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4">
   <main class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl space-y-6">
     <header class="text-center space-y-1">
       <h1 class="text-xl font-bold tracking-tight text-white">Number Formatter</h1>
-      <p class="text-xs text-slate-400">Paste raw numbers to extract and format instantly</p>
+      <p class="text-xs text-slate-400">Paste raw numbers to extract digits instantly</p>
     </header>
 
     <!-- Input Section -->
@@ -37,9 +37,9 @@
     <div class="space-y-4 pt-2">
       <!-- 1st Output -->
       <div class="space-y-1.5">
-        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">1st: Formatted Number</span>
+        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">1st: Extracted Number</span>
         <div class="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-xl p-3.5">
-          <span id="output1" class="font-mono text-sm sm:text-base text-blue-400 font-semibold truncate">+1604326467</span>
+          <span id="output1" class="font-mono text-sm sm:text-base text-blue-400 font-semibold truncate">1604326467</span>
           <button
             onclick="copyText('output1', this)"
             class="ml-3 shrink-0 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white text-xs font-medium px-4 py-2 rounded-lg transition"
@@ -71,23 +71,19 @@
       const output1 = document.getElementById('output1');
 
       if (!raw) {
-        output1.textContent = '+1604326467';
+        output1.textContent = '1604326467';
         return;
       }
 
-      // Strip non-digit characters except leading '+'
-      let clean = raw.replace(/[^\d+]/g, '');
+      // Extract all digits only
+      let digits = raw.replace(/\D/g, '');
 
-      // Remove Bangladesh prefix '880' or '+880' if present
-      if (clean.startsWith('+880')) {
-        clean = clean.replace('+880', '');
-      } else if (clean.startsWith('880')) {
-        clean = clean.replace('880', '');
-      } else if (clean.startsWith('+')) {
-        clean = clean.substring(1);
+      // Strip Bangladesh country code (880) if present at the start
+      if (digits.startsWith('880')) {
+        digits = digits.substring(3);
       }
 
-      output1.textContent = '+' + clean.replace(/\D/g, '');
+      output1.textContent = digits;
     }
 
     async function pasteClipboard() {
